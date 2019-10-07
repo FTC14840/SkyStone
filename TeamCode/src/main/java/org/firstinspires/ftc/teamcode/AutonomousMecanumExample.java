@@ -66,7 +66,7 @@ public class AutonomousMecanumExample extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
-    private static final String VUFORIA_KEY = "Team Vuforia Key Goes Here";
+    private static final String VUFORIA_KEY = "ATqulq//////AAABmfYPXE+z1EORrVmv4Ppo3CcPktGk5mvdMnvPi9/T3DMYGc2mju8KUyG9gAB7pKlb9k9SZnM0YSq1JUZ6trE1ZKmMU8z5QPuhA/b6/Enb+XVGwmjrRjhMfNtUNgiZDhtsUvxr9fQP4HVjTzlz4pv0z3MeWZmkAgIN8T8YM0EFWrW4ODqYQmZjB0Nri2KKVM9dlOZ5udPfTZ9YvMgrCyxxG7O8P84AvwCAyXxzxelL4OfGnbygs0V60CQHx51gqrki613PT/9D1Q1io5+UbN6xAQ26AdYOTmADgJUGlfC2eMyqls4qAIoOj+pcJbm5ryF5yW9pEGHmvor1c9HlCFwhKxiaxw+cTu8AEaAdNuR65i/p";
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
 
@@ -128,39 +128,39 @@ public class AutonomousMecanumExample extends LinearOpMode {
         telemetry.clear();
         telemetry.update();
 
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Object Detected", updatedRecognitions.size());
-
-                        // step through the list of recognitions and display boundary info.
-                        int i = 0;
-                        for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                    recognition.getLeft(), recognition.getTop());
-                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                    recognition.getRight(), recognition.getBottom());
-                        }
-                        telemetry.update();
-                    }
-                }
-            }
-        }
-
-        if (tfod != null) {
-            tfod.shutdown();
-        }
+//        if (opModeIsActive()) {
+//            while (opModeIsActive()) {
+//                if (tfod != null) {
+//                    // getUpdatedRecognitions() will return null if no new information is available since
+//                    // the last time that call was made.
+//                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+//                    if (updatedRecognitions != null) {
+//                        telemetry.addData("# Object Detected", updatedRecognitions.size());
+//
+//                        // step through the list of recognitions and display boundary info.
+//                        int i = 0;
+//                        for (Recognition recognition : updatedRecognitions) {
+//                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+//                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+//                                    recognition.getLeft(), recognition.getTop());
+//                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+//                                    recognition.getRight(), recognition.getBottom());
+//                        }
+//                        telemetry.update();
+//                    }
+//                }
+//            }
+//        }
+//
+//        if (tfod != null) {
+//            tfod.shutdown();
+//        }
 
         // =========================================================================================
         // Start writing the movements for this autonomous sequence below:
         // =========================================================================================
 
-//        GyroDrive(36, .50,0,1000);
+        GyroDrive(4000, .50,0,1000);
 //        GyroDrive(-36,-.50,0,1000);
 //        GyroRight(.50,75,500);
 //        GyroStrafe(-36, -.50,90,1000);
