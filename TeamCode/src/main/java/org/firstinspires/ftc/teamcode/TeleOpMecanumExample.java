@@ -29,21 +29,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
+import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 @TeleOp(name ="TeleOpMecanumExample")
-
-// @Disabled
 
 public class TeleOpMecanumExample extends LinearOpMode {
 
@@ -52,66 +49,64 @@ public class TeleOpMecanumExample extends LinearOpMode {
     private DcMotor backLeft = null;
     private DcMotor backRight = null;
 
-    private Servo servoArm = null;
+    private static final double andymarkTicks = 1120;
+    private static final double tetrixTicks = 1440;
+
+    private static final double ticks = andymarkTicks;
+    private static final double gearReduction = 1.0; // Greater than 1.0; Less than 1.0 if geared up
+    private static final double wheelDiameterInches = 4.0;
+    private static final double conversionTicksToInches = (ticks * gearReduction) / (Math.PI * wheelDiameterInches);
 
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
 
-    private static final double ticks = 1440; // AndyMark = 1120, TETRIX = 1440
-    private static final double gearReduction = 1.0; // Greater than 1.0; Less than 1.0 if geared up
-    private static final double wheelDiameterInches = 4.0;
-    private static final double pi = 3.1415;
-    private static final double conversionTicksToInches = (ticks * gearReduction) / (pi * wheelDiameterInches);
-
     @Override
-    public void runOpMode()throws InterruptedException {
+    public void runOpMode()throws InterruptedException{
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
 
-        servoArm = hardwareMap.servo.get ("servoArm");
-
-        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
-        gyro = (IntegratingGyroscope)navxMicro;
-
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         ResetEncoders();
-        DisableEncoders();
-
-        double servoArmPosition = 0;
-        servoArm.setPosition(servoArmPosition);
+        RunWithoutEncoder();
 
         double speed = 1;
         double direction = 1;
         boolean aButtonPad1 = false;
         boolean bButtonPad1 = false;
-        double turnType = 2.0;
+
+        double piviotTurn = 1.0;
+        double tankTurn = 2.0;
+        double turnType = tankTurn;
 
         double frontLeftClip;
         double frontRightClip;
         double backLeftClip;
         double backRightClip;
 
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
+        gyro = (IntegratingGyroscope) navxMicro;
 
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
 
-        while (navxMicro.isCalibrating())  {
-            telemetry.addData("Calibrating", "%s", Math.round(timer.seconds())%2==0 ? "|.." : "..|");
+        while (navxMicro.isCalibrating()) {
+            telemetry.addData("Calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
             telemetry.update();
             Thread.sleep(50);
         }
 
-        telemetry.log().clear();
+        telemetry.clear();
         telemetry.log().add("Gyro Calibrated. Press Play to Begin!");
+        telemetry.update();
 
         waitForStart();
         telemetry.clear();
+        telemetry.update();
 
         while (opModeIsActive()) {
 
@@ -144,32 +139,12 @@ public class TeleOpMecanumExample extends LinearOpMode {
                 bButtonPad1 = true;
             } else if (bButtonPad1) {
                 bButtonPad1 = false;
-                if (direction == -1) {
-                    direction = 1;
-                } else {
-                    direction = -1;
-                }
+                direction = -direction;
             }
 
             if (gamepad1.y) {
                 ResetEncoders();
-                DisableEncoders();
-            }
-
-            if (gamepad1.dpad_up) {
-                servoArm.setPosition(0.0);
-            }
-
-            if (gamepad1.left_bumper && servoArmPosition > 0.0) {
-                servoArm.setPosition(servoArmPosition -= .02);
-            }
-
-            if (gamepad1.dpad_down) {
-                servoArm.setPosition(1.0);
-            }
-
-            if (gamepad1.right_bumper && servoArmPosition < 1.0) {
-                servoArm.setPosition(servoArmPosition += .02);
+                RunWithoutEncoder();
             }
 
             double gyroHeading = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
@@ -200,7 +175,7 @@ public class TeleOpMecanumExample extends LinearOpMode {
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    private void DisableEncoders() {
+    private void RunWithoutEncoder() {
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

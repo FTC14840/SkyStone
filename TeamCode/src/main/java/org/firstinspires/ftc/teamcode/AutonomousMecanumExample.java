@@ -42,10 +42,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
-import java.util.List;
 
 @Autonomous(name ="AutonomousMecanumExample")
 
@@ -63,12 +60,12 @@ public class AutonomousMecanumExample extends LinearOpMode {
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
 
-    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
-    private static final String LABEL_FIRST_ELEMENT = "Stone";
-    private static final String LABEL_SECOND_ELEMENT = "Skystone";
-    private static final String VUFORIA_KEY = "ATqulq//////AAABmfYPXE+z1EORrVmv4Ppo3CcPktGk5mvdMnvPi9/T3DMYGc2mju8KUyG9gAB7pKlb9k9SZnM0YSq1JUZ6trE1ZKmMU8z5QPuhA/b6/Enb+XVGwmjrRjhMfNtUNgiZDhtsUvxr9fQP4HVjTzlz4pv0z3MeWZmkAgIN8T8YM0EFWrW4ODqYQmZjB0Nri2KKVM9dlOZ5udPfTZ9YvMgrCyxxG7O8P84AvwCAyXxzxelL4OfGnbygs0V60CQHx51gqrki613PT/9D1Q1io5+UbN6xAQ26AdYOTmADgJUGlfC2eMyqls4qAIoOj+pcJbm5ryF5yW9pEGHmvor1c9HlCFwhKxiaxw+cTu8AEaAdNuR65i/p";
-    private VuforiaLocalizer vuforia;
-    private TFObjectDetector tfod;
+//    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+//    private static final String LABEL_FIRST_ELEMENT = "Stone";
+//    private static final String LABEL_SECOND_ELEMENT = "Skystone";
+//    private static final String VUFORIA_KEY = "ATqulq//////AAABmfYPXE+z1EORrVmv4Ppo3CcPktGk5mvdMnvPi9/T3DMYGc2mju8KUyG9gAB7pKlb9k9SZnM0YSq1JUZ6trE1ZKmMU8z5QPuhA/b6/Enb+XVGwmjrRjhMfNtUNgiZDhtsUvxr9fQP4HVjTzlz4pv0z3MeWZmkAgIN8T8YM0EFWrW4ODqYQmZjB0Nri2KKVM9dlOZ5udPfTZ9YvMgrCyxxG7O8P84AvwCAyXxzxelL4OfGnbygs0V60CQHx51gqrki613PT/9D1Q1io5+UbN6xAQ26AdYOTmADgJUGlfC2eMyqls4qAIoOj+pcJbm5ryF5yW9pEGHmvor1c9HlCFwhKxiaxw+cTu8AEaAdNuR65i/p";
+//    private VuforiaLocalizer vuforia;
+//    private TFObjectDetector tfod;
 
     private static final double ticks = 1440; // AndyMark = 1120, Tetrix = 1440
     private static final double gearReduction = 1.0; // Greater than 1.0; Less than 1.0 if geared up
@@ -97,17 +94,17 @@ public class AutonomousMecanumExample extends LinearOpMode {
         StopAndResetEncoder();
         RunUsingEncoder();
 
-        initVuforia();
+//        initVuforia();
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
-
-        if (tfod != null) {
-            tfod.activate();
-        }
+//        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+//            initTfod();
+//        } else {
+//            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+//        }
+//
+//        if (tfod != null) {
+//            tfod.activate();
+//        }
 
         telemetry.log().add("Gyro Calibrating. Do Not Move!");
 
@@ -160,11 +157,11 @@ public class AutonomousMecanumExample extends LinearOpMode {
         // Start writing the movements for this autonomous sequence below:
         // =========================================================================================
 
-        GyroDrive(4000, .50,0,1000);
+//        GyroDrive(36, .50,0,1000);
 //        GyroDrive(-36,-.50,0,1000);
 //        GyroRight(.50,75,500);
 //        GyroStrafe(-36, -.50,90,1000);
-//        GyroStrafe(36,.50,90,1000);
+        GyroStrafe(100,.50,90,1000);
 //        GyroLeft(.50,-75,1000);
 //        GyroRight(.50,-15,1000);
 
@@ -207,10 +204,10 @@ public class AutonomousMecanumExample extends LinearOpMode {
                 double errorMultiple = 1.0;
                 double error = (errorMultiple * (-gyroHeading - angle) / 100);
                 if (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
-                    frontLeft.setPower(power - error);
-                    frontRight.setPower(-power + error);
-                    backLeft.setPower(-power - error);
-                    backRight.setPower(power + error);
+                    frontLeft.setPower(power);
+                    frontRight.setPower(-power);
+                    backLeft.setPower(-power);
+                    backRight.setPower(power);
                     DisplayTelemetry();
                 } else {
                     StopDriving();
@@ -345,35 +342,35 @@ public class AutonomousMecanumExample extends LinearOpMode {
         telemetry.update();
     }
 
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-    }
-
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.8;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
-    }
+//    /**
+//     * Initialize the Vuforia localization engine.
+//     */
+//    private void initVuforia() {
+//        /*
+//         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+//         */
+//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+//
+//        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+//
+//        //  Instantiate the Vuforia engine
+//        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+//
+//        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+//    }
+//
+//    /**
+//     * Initialize the TensorFlow Object Detection engine.
+//     */
+//    private void initTfod() {
+//        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+//                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+//        tfodParameters.minimumConfidence = 0.8;
+//        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+//    }
 
 //==================================================================================================
     // Use these if you don't have a gyro, but have connected encoders.
